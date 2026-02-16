@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Добавить кейс{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <h1 class="my-4">Добавить новый кейс</h1>
+        <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+            <div class="mb-3">
+                <label for="title" class="form-label">Название (необязательно)</label>
+                <input type="text" class="form-control" id="title" name="title" placeholder="Введите название кейса">
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Описание *</label>
+                <textarea class="form-control" id="description" name="description" rows="5" required></textarea>
+                <div class="invalid-feedback">Пожалуйста, введите описание.</div>
+            </div>
+            <div class="mb-3">
+                <label for="difficulty" class="form-label">Уровень сложности *</label>
+                <select class="form-select" id="difficulty" name="difficulty" required>
+                    <option value="" selected disabled>-- выберите --</option>
+                    <option value="junior">Junior</option>
+                    <option value="middle">Middle</option>
+                    <option value="senior">Senior</option>
+                </select>
+                <div class="invalid-feedback">Выберите уровень сложности.</div>
+            </div>
+            <div class="mb-3">
+                <label for="excalidraw_file" class="form-label">Файл .excalidraw *</label>
+                <input class="form-control" type="file" id="excalidraw_file" name="excalidraw_file" accept=".excalidraw,application/json" required>
+                <div class="invalid-feedback">Загрузите файл в формате .excalidraw.</div>
+            </div>
+            <button type="submit" class="btn btn-success">Сохранить</button>
+            <a href="{{ url_for('list_cases') }}" class="btn btn-secondary">Отмена</a>
+        </form>
+    </div>
+</div>
+
+<!-- Скрипт для стилизации ошибок валидации (Bootstrap) -->
+<script>
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
+</script>
+{% endblock %}

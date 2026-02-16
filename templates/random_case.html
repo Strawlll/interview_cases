@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Случайный кейс{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <h1 class="my-4">Случайный кейс</h1>
+        
+        <!-- Форма фильтрации -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="get" action="{{ url_for('random_case') }}" class="row g-3">
+                    <div class="col-md-6">
+                        <label for="difficulty" class="form-label">Уровень сложности</label>
+                        <select class="form-select" id="difficulty" name="difficulty">
+                            <option value="">Любой</option>
+                            <option value="junior" {% if selected_difficulty == 'junior' %}selected{% endif %}>Junior</option>
+                            <option value="middle" {% if selected_difficulty == 'middle' %}selected{% endif %}>Middle</option>
+                            <option value="senior" {% if selected_difficulty == 'senior' %}selected{% endif %}>Senior</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary">Получить случайный кейс</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Результат: если найден кейс -->
+        {% if case %}
+            <div class="card">
+                <div class="card-header">
+                    <strong>Кейс: {{ case.title or 'Без названия' }}</strong>
+                    <span class="float-end">
+                        {% if case.difficulty == 'junior' %}
+                            <span class="badge bg-success">Junior</span>
+                        {% elif case.difficulty == 'middle' %}
+                            <span class="badge bg-warning text-dark">Middle</span>
+                        {% elif case.difficulty == 'senior' %}
+                            <span class="badge bg-danger">Senior</span>
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Описание</h5>
+                    <p class="card-text">{{ case.description }}</p>
+                    <h5 class="card-title mt-3">Содержимое Excalidraw</h5>
+                    <div class="bg-light p-3 rounded" style="max-height: 300px; overflow: auto;">
+                        <pre class="mb-0">{{ case.excalidraw_content }}</pre>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('download_case', case_id=case.id) }}" class="btn btn-sm btn-primary" download>Скачать .excalidraw</a>
+                    <a href="{{ url_for('view_case', case_id=case.id) }}" class="btn btn-sm btn-outline-secondary">Подробнее</a>
+                </div>
+            </div>
+        {% elif selected_difficulty %}
+            <!-- Если параметры были, но кейс не найден (уже обработано через flash) -->
+        {% else %}
+            <p class="text-muted">Выберите параметры и нажмите кнопку, чтобы получить случайный кейс.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

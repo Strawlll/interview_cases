@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Кейс {{ case.id }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <h1 class="my-4">{{ case.title or 'Без названия' }}</h1>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <strong>Уровень сложности:</strong>
+                {% if case.difficulty == 'junior' %}
+                    <span class="badge bg-success">Junior</span>
+                {% elif case.difficulty == 'middle' %}
+                    <span class="badge bg-warning text-dark">Middle</span>
+                {% elif case.difficulty == 'senior' %}
+                    <span class="badge bg-danger">Senior</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Описание</h5>
+                <p class="card-text">{{ case.description }}</p>
+                
+                <h5 class="card-title mt-4">Содержимое Excalidraw</h5>
+                <div class="bg-light p-3 rounded" style="max-height: 400px; overflow: auto;">
+                    <pre class="mb-0">{{ case.excalidraw_content }}</pre>
+                </div>
+            </div>
+            <div class="card-footer text-muted">
+                Добавлен: {{ case.created_at.strftime('%d.%m.%Y %H:%M') }}
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between">
+            <a href="{{ url_for('download_case', case_id=case.id) }}" class="btn btn-primary" download>Скачать .excalidraw файл</a>
+            <a href="{{ url_for('list_cases') }}" class="btn btn-secondary">← Назад к списку</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

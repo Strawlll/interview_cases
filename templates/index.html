@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Главная{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-8 text-center">
+        <h1 class="display-4">Добро пожаловать в сервис кейсов для собеседований</h1>
+        <p class="lead">Здесь вы можете добавлять и изучать кейсы в формате Excalidraw.</p>
+        <hr class="my-4">
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{{ url_for('list_cases') }}" class="btn btn-primary btn-lg">Все кейсы</a>
+            <a href="{{ url_for('add_case') }}" class="btn btn-success btn-lg">Добавить кейс</a>
+            <a href="{{ url_for('random_case') }}" class="btn btn-info btn-lg">Случайный кейс</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

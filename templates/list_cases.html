@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Все кейсы{% endblock %}
+{% block content %}
+<h1 class="my-4">Список кейсов</h1>
+
+<!-- Фильтр по сложности -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <form method="get" class="d-flex align-items-center">
+            <label for="difficulty" class="me-2">Фильтр:</label>
+            <select class="form-select" id="difficulty" name="difficulty" onchange="this.form.submit()">
+                <option value="">Все уровни</option>
+                <option value="junior" {% if selected_difficulty == 'junior' %}selected{% endif %}>Junior</option>
+                <option value="middle" {% if selected_difficulty == 'middle' %}selected{% endif %}>Middle</option>
+                <option value="senior" {% if selected_difficulty == 'senior' %}selected{% endif %}>Senior</option>
+            </select>
+            <noscript>
+                <button type="submit" class="btn btn-primary ms-2">Применить</button>
+            </noscript>
+        </form>
+    </div>
+</div>
+
+{% if cases %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for case in cases %}
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ case.title or 'Без названия' }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            Сложность: 
+                            {% if case.difficulty == 'junior' %}
+                                <span class="badge bg-success">Junior</span>
+                            {% elif case.difficulty == 'middle' %}
+                                <span class="badge bg-warning text-dark">Middle</span>
+                            {% elif case.difficulty == 'senior' %}
+                                <span class="badge bg-danger">Senior</span>
+                            {% endif %}
+                        </h6>
+                        <p class="card-text">{{ case.description[:150] }}...</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-top-0">
+                        <a href="{{ url_for('view_case', case_id=case.id) }}" class="btn btn-outline-primary btn-sm">Подробнее</a>
+                        <small class="text-muted float-end">добавлен {{ case.created_at.strftime('%d.%m.%Y') }}</small>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="alert alert-info" role="alert">
+        Кейсов пока нет. <a href="{{ url_for('add_case') }}" class="alert-link">Добавьте первый!</a>
+    </div>
+{% endif %}
+{% endblock %}
