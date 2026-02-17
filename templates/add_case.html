@@ -25,9 +25,9 @@
                 <div class="invalid-feedback">Выберите уровень сложности.</div>
             </div>
             <div class="mb-3">
-                <label for="excalidraw_file" class="form-label">Файл .excalidraw *</label>
-                <input class="form-control" type="file" id="excalidraw_file" name="excalidraw_file" accept=".excalidraw,application/json" required>
-                <div class="invalid-feedback">Загрузите файл в формате .excalidraw.</div>
+                <label for="excalidraw_file" class="form-label">Файл .excalidraw (необязательно)</label>
+                <input class="form-control" type="file" id="excalidraw_file" name="excalidraw_file" accept=".excalidraw,application/json">
+                <div class="form-text">Если файл не прикреплён, кейс будет доступен только с описанием.</div>
             </div>
             <button type="submit" class="btn btn-success">Сохранить</button>
             <a href="{{ url_for('list_cases') }}" class="btn btn-secondary">Отмена</a>
