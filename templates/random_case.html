@@ -49,7 +49,11 @@
                     </div>
                 </div>
                 <div class="card-footer">
-                    <a href="{{ url_for('download_case', case_id=case.id) }}" class="btn btn-sm btn-primary" download>Скачать .excalidraw</a>
+                     {% if case.excalidraw_content %}
+        <a href="{{ url_for('download_case', case_id=case.id) }}" class="btn btn-primary" download>Скачать .excalidraw файл</a>
+    {% else %}
+        <button class="btn btn-sm btn-outline-secondary" disabled>Файл отсутствует</button>
+    {% endif %}
                     <a href="{{ url_for('view_case', case_id=case.id) }}" class="btn btn-sm btn-outline-secondary">Подробнее</a>
                 </div>
             </div>

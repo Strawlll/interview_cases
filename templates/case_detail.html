@@ -21,9 +21,13 @@
                 <p class="card-text">{{ case.description }}</p>
                 
                 <h5 class="card-title mt-4">Содержимое Excalidraw</h5>
+                {% if case.excalidraw_content %}
                 <div class="bg-light p-3 rounded" style="max-height: 400px; overflow: auto;">
-                    <pre class="mb-0">{{ case.excalidraw_content }}</pre>
-                </div>
+            <pre class="mb-0">{{ case.excalidraw_content }}</pre>
+    </div>
+{% else %}
+    <div class="alert alert-secondary">Файл не прикреплён.</div>
+{% endif %}
             </div>
             <div class="card-footer text-muted">
                 Добавлен: {{ case.created_at.strftime('%d.%m.%Y %H:%M') }}
@@ -31,7 +35,11 @@
         </div>
 
         <div class="d-flex justify-content-between">
-            <a href="{{ url_for('download_case', case_id=case.id) }}" class="btn btn-primary" download>Скачать .excalidraw файл</a>
+            {% if case.excalidraw_content %}
+        <a href="{{ url_for('download_case', case_id=case.id) }}" class="btn btn-primary" download>Скачать .excalidraw файл</a>
+    {% else %}
+        <button class="btn btn-secondary" disabled>Файл отсутствует</button>
+    {% endif %}
             <a href="{{ url_for('list_cases') }}" class="btn btn-secondary">← Назад к списку</a>
         </div>
     </div>
