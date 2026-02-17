@@ -1,6 +1,6 @@
 import os
 import json
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_file
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_file, abort
 from dotenv import load_dotenv
 from models import db, Case
 import io
@@ -35,7 +35,7 @@ def list_cases():
 
 @app.route('/cases/add', methods=['GET', 'POST'])
 def add_case():
-    """Добавление нового кейса"""
+    """Добавление нового кейса (файл теперь необязателен)"""
     if request.method == 'POST':
         title = request.form.get('title', '').strip() or None
         description = request.form.get('description', '').strip()
@@ -43,25 +43,25 @@ def add_case():
         file = request.files.get('excalidraw_file')
 
         # Проверка обязательных полей
-        if not description or not difficulty or not file:
-            flash('Пожалуйста, заполните все обязательные поля и загрузите файл.', 'danger')
+        if not description or not difficulty:
+            flash('Пожалуйста, заполните все обязательные поля.', 'danger')
             return redirect(url_for('add_case'))
 
-        # Проверка расширения файла (необязательно, но полезно)
-        if not file.filename.endswith('.excalidraw'):
-            flash('Файл должен иметь расширение .excalidraw', 'danger')
-            return redirect(url_for('add_case'))
+        # Если файл загружен, проверяем его расширение и содержимое
+        content = None
+        if file and file.filename:
+            if not file.filename.endswith('.excalidraw'):
+                flash('Файл должен иметь расширение .excalidraw', 'danger')
+                return redirect(url_for('add_case'))
+            try:
+                content = file.read().decode('utf-8')
+                # Проверяем, что это валидный JSON
+                json.loads(content)
+            except (UnicodeDecodeError, json.JSONDecodeError):
+                flash('Файл должен быть корректным JSON (формат .excalidraw)', 'danger')
+                return redirect(url_for('add_case'))
 
-        try:
-            # Читаем содержимое файла как текст
-            content = file.read().decode('utf-8')
-            # Проверяем, что это валидный JSON
-            json.loads(content)
-        except (UnicodeDecodeError, json.JSONDecodeError):
-            flash('Файл должен быть корректным JSON (формат .excalidraw)', 'danger')
-            return redirect(url_for('add_case'))
-
-        # Создаём запись в БД
+        # Создаём запись в БД (content может быть None)
         case = Case(
             title=title,
             description=description,
@@ -74,7 +74,6 @@ def add_case():
         flash('Кейс успешно добавлен!', 'success')
         return redirect(url_for('list_cases'))
 
-    # GET-запрос — показываем форму
     return render_template('add_case.html')
 
 @app.route('/cases/<int:case_id>')
@@ -85,9 +84,11 @@ def view_case(case_id):
 
 @app.route('/cases/<int:case_id>/download')
 def download_case(case_id):
-    """Скачивание файла .excalidraw для кейса"""
+    """Скачивание файла .excalidraw для кейса (если он есть)"""
     case = Case.query.get_or_404(case_id)
-    # Создаём виртуальный файл для отправки
+    if not case.excalidraw_content:
+        abort(404, description="Файл не прикреплён к этому кейсу.")
+    
     file_data = io.BytesIO(case.excalidraw_content.encode('utf-8'))
     filename = f"case_{case_id}.excalidraw"
     if case.title:
@@ -103,14 +104,15 @@ def download_case(case_id):
 def random_case():
     """Получение случайного кейса по параметрам (сложность)"""
     difficulty = request.args.get('difficulty')
-    case = None
+
+    # Если сложность указана и не пустая – фильтруем, иначе – все кейсы
     if difficulty:
         case = Case.query.filter_by(difficulty=difficulty).order_by(db.func.random()).first()
     else:
-        # Если параметры не указаны, просто показываем форму (case остаётся None)
-        pass
+        case = Case.query.order_by(db.func.random()).first()
 
-    # Если параметры были, но кейс не найден
+    print(case)
+    # Если кейс не найден (например, нет кейсов с такой сложностью)
     if difficulty and not case:
         flash('Кейс не найден по заданным критериям', 'warning')
         return redirect(url_for('random_case'))
